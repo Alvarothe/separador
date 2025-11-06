@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Substituidor de Texto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-gray-800 mb-3">
+                <i class="fas fa-exchange-alt text-blue-600 mr-3"></i>
+                Substituidor de Texto
+            </h1>
+            <p class="text-gray-600 text-lg">Substitua palavras e frases de forma rápida e eficiente</p>
+        </header>
+
+        <main class="grid lg:grid-cols-2 gap-8">
+            <!-- Seção de Entrada -->
+            <section class="space-y-6">
+                <!-- Texto Original -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-file-alt text-blue-500 mr-2"></i>
+                        Texto Original
+                    </h2>
+                    <textarea 
+                        id="originalText" 
+                        class="w-full h-64 p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none transition-colors"
+                        placeholder="Cole seu texto aqui..."
+                    >WHEN motivo_real_cancelamento = "CONSIDERA VALOR ELEVADO." THEN "FINANCEIRO"
+WHEN Motivo Real do Cancelamento = "SEM CONDIÇÕES FINANCEIRAS/DESEMPREGO." THEN "FINANCEIRO"</textarea>
+                    <div class="mt-3 flex justify-between items-center">
+                        <span id="charCount" class="text-sm text-gray-500">0 caracteres</span>
+                        <button onclick="clearOriginal()" class="text-sm text-red-500 hover:text-red-700 transition-colors">
+                            <i class="fas fa-trash mr-1"></i>Limpar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Substituição Única -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-sync-alt text-green-500 mr-2"></i>
+                        Substituição Única
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Procurar por:</label>
+                            <input 
+                                type="text" 
+                                id="findText" 
+                                class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+                                placeholder="Digite o texto a ser substituído"
+                                value="Motivo Real do Cancelamento"
+                            >
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Substituir por:</label>
+                            <input 
+                                type="text" 
+                                id="replaceText" 
+                                class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+                                placeholder="Digite o texto de substituição"
+                                value="motivo_real_cancelamento"
+                            >
+                        </div>
+                        <div class="flex gap-3">
+                            <button 
+                                onclick="performSingleReplace()" 
+                                class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                            >
+                                <i class="fas fa-exchange-alt mr-2"></i>
+                                Substituir
+                            </button>
+                            <button 
+                                onclick="addToBatch()" 
+                                class="bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors font-medium"
+                                title="Adicionar à lista de substituições"
+                            >
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção de Saída -->
+            <section class="space-y-6">
+                <!-- Lista de Substituições -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center justify-between">
+                        <span>
+                            <i class="fas fa-list text-purple-500 mr-2"></i>
+                            Lista de Substituições
+                        </span>
+                        <button 
+                            onclick="clearBatch()" 
+                            class="text-sm text-red-500 hover:text-red-700 transition-colors"
+                        >
+                            <i class="fas fa-trash mr-1"></i>Limpar Lista
+                        </button>
+                    </h2>
+                    <div id="batchList" class="space-y-2 max-h-64 overflow-y-auto">
+                        <p class="text-gray-500 text-center py-4">Nenhuma substituição adicionada</p>
+                    </div>
+                    <button 
+                        onclick="performBatchReplace()" 
+                        class="w-full mt-4 bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        id="batchButton"
+                        disabled
+                    >
+                        <i class="fas fa-magic mr-2"></i>
+                        Aplicar Todas as Substituições
+                    </button>
+                </div>
+
+                <!-- Texto Resultado -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center justify-between">
+                        <span>
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Texto Resultado
+                        </span>
+                        <button 
+                            onclick="copyResult()" 
+                            class="text-sm text-blue-500 hover:text-blue-700 transition-colors"
+                            id="copyButton"
+                            style="display: none;"
+                        >
+                            <i class="fas fa-copy mr-1"></i>Copiar
+                        </button>
+                    </h2>
+                    <textarea 
+                        id="resultText" 
+                        class="w-full h-64 p-4 border-2 border-gray-200 rounded-lg bg-gray-50 resize-none"
+                        readonly
+                        placeholder="O resultado aparecerá aqui..."
+                    ></textarea>
+                    <div class="mt-3 flex justify-between items-center">
+                        <span id="replaceCount" class="text-sm text-gray-500">0 substituições</span>
+                        <button 
+                            onclick="clearResult()" 
+                            class="text-sm text-red-500 hover:text-red-700 transition-colors"
+                            id="clearResultButton"
+                            style="display: none;"
+                        >
+                            <i class="fas fa-trash mr-1"></i>Limpar
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Opções Avançadas -->
+        <section class="mt-8 bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-cog text-gray-500 mr-2"></i>
+                Opções Avançadas
+            </h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <label class="flex items-center space-x-3 cursor-pointer">
+                    <input type="checkbox" id="caseSensitive" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                    <span class="text-gray-700">Diferenciar maiúsculas/minúsculas</span>
+                </label>
+                <label class="flex items-center space-x-3 cursor-pointer">
+                    <input type="checkbox" id="wholeWord" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                    <span class="text-gray-700">Palavra inteira apenas</span>
+                </label>
+            </div>
+        </section>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full transition-transform duration-300">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toastMessage">Texto copiado!</span>
+        </div>
+    </div>
+
+    <script>
+        let batchReplacements = [];
+
+        // Atualizar contador de caracteres
+        document.getElementById('originalText').addEventListener('input', function() {
+            document.getElementById('charCount').textContent = this.value.length + ' caracteres';
+        });
+
+        // Limpar texto original
+        function clearOriginal() {
+            document.getElementById('originalText').value = '';
+            document.getElementById('charCount').textContent = '0 caracteres';
+        }
+
+        // Realizar substituição única
+        function performSingleReplace() {
+            const original = document.getElementById('originalText').value;
+            const find = document.getElementById('findText').value;
+            const replace = document.getElementById('replaceText').value;
+            
+            if (!original || !find) {
+                showToast('Por favor, preencha todos os campos', 'error');
+                return;
+            }
+
+            const result = replaceText(original, find, replace);
+            document.getElementById('resultText').value = result.text;
+            document.getElementById('replaceCount').textContent = result.count + ' substituições';
+            document.getElementById('copyButton').style.display = 'inline-block';
+            document.getElementById('clearResultButton').style.display = 'inline-block';
+            
+            showToast(`${result.count} substituição(ões) realizada(s)`);
+        }
+
+        // Adicionar à lista de substituições
+        function addToBatch() {
+            const find = document.getElementById('findText').value;
+            const replace = document.getElementById('replaceText').value;
+            
+            if (!find || !replace) {
+                showToast('Por favor, preencha ambos os campos', 'error');
+                return;
+            }
+
+            // Verificar se já existe
+            const exists = batchReplacements.some(r => r.find === find);
+            if (exists) {
+                showToast('Esta substituição já está na lista', 'error');
+                return;
+            }
+
+            batchReplacements.push({ find, replace });
+            updateBatchList();
+            showToast('Substituição adicionada à lista');
+            
+            // Limpar campos
+            document.getElementById('findText').value = '';
+            document.getElementById('replaceText').value = '';
+        }
+
+        // Atualizar lista de substituições
+        function updateBatchList() {
+            const listElement = document.getElementById('batchList');
+            const buttonElement = document.getElementById('batchButton');
+            
+            if (batchReplacements.length === 0) {
+                listElement.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhuma substituição adicionada</p>';
+                buttonElement.disabled = true;
+            } else {
+                listElement.innerHTML = batchReplacements.map((item, index) => `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg fade-in">
+                        <div class="flex-1">
+                            <span class="font-medium text-red-600">"${item.find}"</span>
+                            <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                            <span class="font-medium text-green-600">"${item.replace}"</span>
+                        </div>
+                        <button onclick="removeFromBatch(${index})" class="text-red-500 hover:text-red-700 ml-2">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `).join('');
+                buttonElement.disabled = false;
+            }
+        }
+
+        // Remover da lista
+        function removeFromBatch(index) {
+            batchReplacements.splice(index, 1);
+            updateBatchList();
+        }
+
+        // Limpar lista
+        function clearBatch() {
+            batchReplacements = [];
+            updateBatchList();
+            showToast('Lista limpa');
+        }
+
+        // Realizar substituições em lote
+        function performBatchReplace() {
+            const original = document.getElementById('originalText').value;
+            if (!original) {
+                showToast('Por favor, insira um texto original', 'error');
+                return;
+            }
+
+            let result = original;
+            let count = 0;
+
+            batchReplacements.forEach(item => {
+                const replaceResult = replaceText(result, item.find, item.replace);
+                result = replaceResult.text;
+                count += replaceResult.count;
+            });
+
+            document.getElementById('resultText').value = result;
+            document.getElementById('replaceCount').textContent = count + ' substituições';
+            document.getElementById('copyButton').style.display = 'inline-block';
+            document.getElementById('clearResultButton').style.display = 'inline-block';
+            
+            showToast(`${count} substituição(ões) realizada(s) em lote`);
+        }
+
+        // Função principal de substituição
+        function replaceText(text, find, replace) {
+            const caseSensitive = document.getElementById('caseSensitive').checked;
+            const wholeWord = document.getElementById('wholeWord').checked;
+            
+            let count = 0;
+            let result = text;
+            
+            // Preparar regex
+            let flags = caseSensitive ? 'g' : 'gi';
+            let pattern = find;
+            
+            if (wholeWord) {
+                pattern = '\\b' + escapeRegExp(find) + '\\b';
+            } else {
+                pattern = escapeRegExp(find);
+            }
+            
+            const regex = new RegExp(pattern, flags);
+            
+            // Contar substituições
+            const matches = text.match(regex);
+            count = matches ? matches.length : 0;
+            
+            // Realizar substituição
+            result = text.replace(regex, replace);
+            
+            return { text: result, count };
+        }
+
+        // Escapar caracteres especiais para regex
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Copiar resultado
+        function copyResult() {
+            const resultText = document.getElementById('resultText').value;
+            navigator.clipboard.writeText(resultText).then(() => {
+                showToast('Texto copiado para a área de transferência');
+            });
+        }
+
+        // Limpar resultado
+        function clearResult() {
+            document.getElementById('resultText').value = '';
+            document.getElementById('replaceCount').textContent = '0 substituições';
+            document.getElementById('copyButton').style.display = 'none';
+            document.getElementById('clearResultButton').style.display = 'none';
+        }
+
+        // Mostrar notificação
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-transform duration-300 ${
+                type === 'error' ? 'bg-red-600' : 'bg-green-600'
+            } text-white`;
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-full');
+            }, 100);
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-full');
+            }, 3000);
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Adicionar evento de Enter nos campos
+            document.getElementById('findText').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('replaceText').focus();
+                }
+            });
+            
+            document.getElementById('replaceText').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSingleReplace();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
