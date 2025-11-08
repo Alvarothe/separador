@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formatador de Lista de Cidades</title>
+    <title>Formatador de Lista</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -22,45 +22,150 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
-        .btn-substituidor {
-    background: linear-gradient(135deg, #007bff, #00b4d8);
-    color: white;
-    padding: 14px 32px;
-    border: none;
-    border-radius: 8px;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    text-decoration: none;
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-  }
-
-  .btn-substituidor:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 123, 255, 0.4);
-  }
-
-  .btn-substituidor:active {
-    transform: scale(0.97);
-  }
+        
+        /* Estilos da barra de navegação */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a2a6c;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand i {
+            margin-right: 10px;
+            color: #4a69bd;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+        
+        .navbar-item a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-item a i {
+            margin-right: 6px;
+        }
+        
+        .navbar-item a:hover {
+            background: rgba(74, 105, 189, 0.1);
+            color: #1a2a6c;
+        }
+        
+        .navbar-item a.active {
+            background: #4a69bd;
+            color: white;
+        }
+        
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                padding: 15px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                display: none;
+            }
+            
+            .navbar-menu.active {
+                display: flex;
+            }
+            
+            .navbar-toggle {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-      <a href="substituidor.html" class="btn-substituidor">
-    Ir para Substituidor
-  </a>
-        <a href="calcbdh.html" class="btn-substituidor">
-    Ir para calculadora de ponto
-  </a>
+    <!-- Barra de Navegação -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-brand">
+                <i class="fas fa-tools"></i>
+                Ferramentas de Texto
+            </a>
+            
+            <button class="navbar-toggle" id="navbarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <ul class="navbar-menu" id="navbarMenu">
+                <li class="navbar-item">
+                    <a href="index.html" class="active">
+                        <i class="fas fa-file-alt"></i>
+                        Formatador
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a href="substituidor.html">
+                        <i class="fas fa-exchange-alt"></i>
+                        Substituidor
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a href="calcbdh.html">
+                        <i class="fas fa-calculator"></i>
+                        Calculadora
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- Conteúdo Principal -->
     <div class="container mx-auto px-4 py-8 max-w-4xl">
         <!-- Header -->
         <header class="text-center mb-10 fade-in">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-full mb-4">
                 <i class="fas fa-city text-white text-2xl"></i>
             </div>
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">Formatador de Lista de Cidades</h1>
-            <p class="text-gray-600">Transforme sua lista de cidades em um formato padronizado com aspas e vírgulas</p>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Formatador de Lista</h1>
+            <p class="text-gray-600">Transforme sua lista em um formato padronizado com aspas e vírgulas</p>
         </header>
 
         <!-- Main Content -->
@@ -161,7 +266,7 @@
                     <h3 class="text-sm font-semibold text-indigo-800 mb-2">Estatísticas</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
-                            <span class="text-gray-600">Total de cidades:</span>
+                            <span class="text-gray-600">Total:</span>
                             <span id="totalCities" class="font-semibold text-indigo-700 ml-1">0</span>
                         </div>
                         <div>
@@ -183,11 +288,17 @@
 
         <!-- Footer -->
         <footer class="text-center mt-8 text-gray-600 text-sm">
-            <p>Formatador de Lista de Cidades • Feito com <i class="fas fa-heart text-red-500"></i> para facilitar seu trabalho</p>
+            <p>Formatador de Lista • Feito com <i class="fas fa-heart text-red-500"></i> para facilitar seu trabalho</p>
         </footer>
     </div>
 
     <script>
+        // Script para o menu responsivo
+        document.getElementById('navbarToggle').addEventListener('click', function() {
+            const navbarMenu = document.getElementById('navbarMenu');
+            navbarMenu.classList.toggle('active');
+        });
+        
         let originalCities = [];
         let duplicatesCount = 0;
 
@@ -310,16 +421,9 @@
         }
 
         function loadExample() {
-            const example = `São Paulo
-Rio de Janeiro
-Belo Horizonte
-Porto Alegre
-Salvador
-Fortaleza
-Brasília
-Curitiba
-Manaus
-Recife`;
+            const example = `dados1
+            dados2
+            dados3`;
             document.getElementById('cityInput').value = example;
             showNotification('Exemplo carregado!', 'success');
         }

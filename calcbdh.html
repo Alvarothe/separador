@@ -18,6 +18,88 @@
             background: linear-gradient(135deg, #1a2a6c, #2d4a9c, #4a69bd);
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+        
+        /* Estilos da barra de navegação */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a2a6c;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand i {
+            margin-right: 10px;
+            color: #4a69bd;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+        
+        .navbar-item a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-item a i {
+            margin-right: 6px;
+        }
+        
+        .navbar-item a:hover {
+            background: rgba(74, 105, 189, 0.1);
+            color: #1a2a6c;
+        }
+        
+        .navbar-item a.active {
+            background: #4a69bd;
+            color: white;
+        }
+        
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+        }
+        
+        /* Conteúdo principal */
+        .main-content {
+            flex: 1;
+            display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
@@ -179,7 +261,28 @@
             font-size: 14px;
         }
         
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
+            .navbar-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                padding: 15px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                display: none;
+            }
+            
+            .navbar-menu.active {
+                display: flex;
+            }
+            
+            .navbar-toggle {
+                display: block;
+            }
+            
             .container {
                 padding: 25px;
             }
@@ -192,101 +295,116 @@
                 font-size: 36px;
             }
         }
-                .btn-substituidor {
-    background: linear-gradient(135deg, #007bff, #00b4d8);
-    color: white;
-    padding: 14px 32px;
-    border: none;
-    border-radius: 8px;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    text-decoration: none;
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-  }
-
-  .btn-substituidor:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 123, 255, 0.4);
-  }
-
-  .btn-substituidor:active {
-    transform: scale(0.97);
-  }
     </style>
 </head>
 <body>
-    <body class="bg-gray-50 min-h-screen">
-            <a href="index.html" class="btn-substituidor">
-    voltar ao formatador
-  </a>
-<body class="bg-gray-50 min-h-screen">
-            <a href="substituidor.html" class="btn-substituidor">
-    Ir para o substituidor
-  </a>
-    <div class="container">
-        <h1><i class="fas fa-clock"></i> Calculadora de Banco de Horas</h1>
-        
-        <div class="info-box">
-            <i class="fas fa-info-circle"></i> 
-            Preencha os campos abaixo para calcular seu horário de saída
-        </div>
-        
-        <form id="calculatorForm">
-            <div class="form-group">
-                <label for="entrada">Horário de Entrada</label>
-                <div class="time-input">
-                    <input type="time" id="entrada" required>
-                    <i class="fas fa-sign-in-alt"></i>
-                </div>
-            </div>
+    <!-- Barra de Navegação -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-brand">
+                <i class="fas fa-clock"></i>
+                Ferramentas de Tempo
+            </a>
             
-            <div class="form-group">
-                <label>Jornada de Trabalho</label>
-                <div class="row">
-                    <div class="col">
-                        <input type="number" id="jornada-horas" min="0" max="12" placeholder="Horas" required>
-                    </div>
-                    <div class="col">
-                        <input type="number" id="jornada-minutos" min="0" max="59" placeholder="Minutos" required>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>Banco de Horas</label>
-                <div class="row">
-                    <div class="col">
-                        <input type="number" id="banco-horas" placeholder="Horas" required>
-                    </div>
-                    <div class="col">
-                        <input type="number" id="banco-minutos" min="0" max="59" placeholder="Minutos" required>
-                    </div>
-                </div>
-                <small style="color: #777; margin-top: 5px; display: block;">
-                    <i class="fas fa-exclamation-circle"></i> 
-                    Use valores negativos para débito (ex: -2 para 2 horas de débito)
-                </small>
-            </div>
-            
-            <button type="submit" class="btn">
-                <i class="fas fa-calculator"></i> Calcular Horário de Saída
+            <button class="navbar-toggle" id="navbarToggle">
+                <i class="fas fa-bars"></i>
             </button>
-        </form>
-        
-        <div id="resultContainer" class="result-container">
-            <div class="result-title">Seu horário de saída deve ser:</div>
-            <div id="resultTime" class="result-time">--:--</div>
-            <div id="resultMessage" class="result-message"></div>
+            
+            <ul class="navbar-menu" id="navbarMenu">
+                <li class="navbar-item">
+                    <a href="index.html">
+                        <i class="fas fa-file-alt"></i>
+                        Formatador
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a href="substituidor.html">
+                        <i class="fas fa-exchange-alt"></i>
+                        Substituidor
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a href="calculadora.html" class="active">
+                        <i class="fas fa-calculator"></i>
+                        Calculadora
+                    </a>
+                </li>
+            </ul>
         </div>
-        
-        <div class="footer">
-            <p>Calculadora de Banco de Horas &copy; 2023</p>
+    </nav>
+    
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <div class="container">
+            <h1><i class="fas fa-clock"></i> Calculadora de Banco de Horas</h1>
+            
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i> 
+                Preencha os campos abaixo para calcular seu horário de saída
+            </div>
+            
+            <form id="calculatorForm">
+                <div class="form-group">
+                    <label for="entrada">Horário de Entrada</label>
+                    <div class="time-input">
+                        <input type="time" id="entrada" required>
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Jornada de Trabalho</label>
+                    <div class="row">
+                        <div class="col">
+                            <input type="number" id="jornada-horas" min="0" max="12" placeholder="Horas" required>
+                        </div>
+                        <div class="col">
+                            <input type="number" id="jornada-minutos" min="0" max="59" placeholder="Minutos" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Banco de Horas</label>
+                    <div class="row">
+                        <div class="col">
+                            <input type="number" id="banco-horas" placeholder="Horas" required>
+                        </div>
+                        <div class="col">
+                            <input type="number" id="banco-minutos" min="0" max="59" placeholder="Minutos" required>
+                        </div>
+                    </div>
+                    <small style="color: #777; margin-top: 5px; display: block;">
+                        <i class="fas fa-exclamation-circle"></i> 
+                        Use valores negativos para débito (ex: -2 para 2 horas de débito)
+                    </small>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-calculator"></i> Calcular Horário de Saída
+                </button>
+            </form>
+            
+            <div id="resultContainer" class="result-container">
+                <div class="result-title">Seu horário de saída deve ser:</div>
+                <div id="resultTime" class="result-time">--:--</div>
+                <div id="resultMessage" class="result-message"></div>
+            </div>
+            
+            <div class="footer">
+                <p>Calculadora de Banco de Horas &copy; 2023</p>
+            </div>
         </div>
     </div>
 
     <script>
+        // Script para o menu responsivo
+        document.getElementById('navbarToggle').addEventListener('click', function() {
+            const navbarMenu = document.getElementById('navbarMenu');
+            navbarMenu.classList.toggle('active');
+        });
+        
+        // Script para a calculadora
         document.getElementById('calculatorForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
