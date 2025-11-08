@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formatador de Lista</title>
+    <title>Formatador de Lista para Array</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -162,10 +162,10 @@
         <!-- Header -->
         <header class="text-center mb-10 fade-in">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-full mb-4">
-                <i class="fas fa-city text-white text-2xl"></i>
+                <i class="fas fa-code text-white text-2xl"></i>
             </div>
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">Formatador de Lista</h1>
-            <p class="text-gray-600">Transforme sua lista em um formato padronizado com aspas e vírgulas</p>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Formatador de Lista para Array</h1>
+            <p class="text-gray-600">Transforme sua lista de dados em um formato de array padronizado</p>
         </header>
 
         <!-- Main Content -->
@@ -175,7 +175,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-xl font-semibold text-gray-800 flex items-center">
                         <i class="fas fa-edit text-indigo-600 mr-2"></i>
-                        Digite suas cidades
+                        Digite sua lista de dados
                     </h2>
                     <button onclick="loadExample()" class="text-sm text-indigo-600 hover:text-indigo-800 transition-colors">
                         <i class="fas fa-magic mr-1"></i> Carregar exemplo
@@ -183,13 +183,13 @@
                 </div>
                 
                 <textarea 
-                    id="cityInput" 
+                    id="dataInput" 
                     class="w-full h-40 p-4 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition-colors resize-none"
-                    placeholder="Digite as cidades separadas por vírgula ou uma por linha&#10;Exemplo: São Paulo, Rio de Janeiro, Belo Horizonte"
+                    placeholder="Digite os itens separados por vírgula ou um por linha&#10;Exemplo: item1, item2, item3"
                 ></textarea>
                 
                 <div class="mt-4 flex flex-wrap gap-3">
-                    <button onclick="formatCities()" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center">
+                    <button onclick="formatData()" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center">
                         <i class="fas fa-wand-magic-sparkles mr-2"></i>
                         Formatar
                     </button>
@@ -235,7 +235,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-xl font-semibold text-gray-800 flex items-center">
                         <i class="fas fa-check-circle text-green-600 mr-2"></i>
-                        Resultado formatado
+                        Array formatado
                     </h2>
                     <div class="flex gap-2">
                         <button onclick="copyToClipboard()" id="copyBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center text-sm">
@@ -251,10 +251,10 @@
                 
                 <div class="relative">
                     <textarea 
-                        id="cityOutput" 
+                        id="dataOutput" 
                         class="w-full h-32 p-4 border-2 border-gray-200 rounded-lg bg-gray-50 focus:border-green-500 focus:outline-none transition-colors resize-none font-mono text-sm"
                         readonly
-                        placeholder="O resultado formatado aparecerá aqui..."
+                        placeholder="O array formatado aparecerá aqui..."
                     ></textarea>
                     <div id="copySuccess" class="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-lg text-sm opacity-0 transition-opacity pointer-events-none">
                         <i class="fas fa-check mr-1"></i> Copiado!
@@ -266,8 +266,8 @@
                     <h3 class="text-sm font-semibold text-indigo-800 mb-2">Estatísticas</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
-                            <span class="text-gray-600">Total:</span>
-                            <span id="totalCities" class="font-semibold text-indigo-700 ml-1">0</span>
+                            <span class="text-gray-600">Total de itens:</span>
+                            <span id="totalItems" class="font-semibold text-indigo-700 ml-1">0</span>
                         </div>
                         <div>
                             <span class="text-gray-600">Caracteres:</span>
@@ -288,7 +288,7 @@
 
         <!-- Footer -->
         <footer class="text-center mt-8 text-gray-600 text-sm">
-            <p>Formatador de Lista • Feito com <i class="fas fa-heart text-red-500"></i> para facilitar seu trabalho</p>
+            <p>Formatador de Lista para Array • Feito com <i class="fas fa-heart text-red-500"></i> para facilitar seu trabalho</p>
         </footer>
     </div>
 
@@ -299,13 +299,13 @@
             navbarMenu.classList.toggle('active');
         });
         
-        let originalCities = [];
+        let originalData = [];
         let duplicatesCount = 0;
 
-        function formatCities() {
-            const input = document.getElementById('cityInput').value;
+        function formatData() {
+            const input = document.getElementById('dataInput').value;
             if (!input.trim()) {
-                showNotification('Por favor, digite algumas cidades primeiro!', 'warning');
+                showNotification('Por favor, digite alguns dados primeiro!', 'warning');
                 return;
             }
 
@@ -316,57 +316,57 @@
             const trimSpaces = document.getElementById('trimSpaces').checked;
 
             // Process input
-            let cities = input.split(/[,\n]/).filter(city => city.trim());
-            originalCities = [...cities];
+            let dataItems = input.split(/[,\n]/).filter(item => item.trim());
+            originalData = [...dataItems];
             
             // Trim spaces if enabled
             if (trimSpaces) {
-                cities = cities.map(city => city.trim());
+                dataItems = dataItems.map(item => item.trim());
             }
 
             // Remove duplicates if enabled
             duplicatesCount = 0;
             if (removeDuplicates) {
-                const uniqueCities = [];
+                const uniqueItems = [];
                 const seen = new Set();
-                cities.forEach(city => {
-                    if (!seen.has(city.toLowerCase())) {
-                        seen.add(city.toLowerCase());
-                        uniqueCities.push(city);
+                dataItems.forEach(item => {
+                    if (!seen.has(item.toLowerCase())) {
+                        seen.add(item.toLowerCase());
+                        uniqueItems.push(item);
                     } else {
                         duplicatesCount++;
                     }
                 });
-                cities = uniqueCities;
+                dataItems = uniqueItems;
             }
 
             // Sort alphabetically if enabled
             if (sortAlphabetically) {
-                cities.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+                dataItems.sort((a, b) => a.localeCompare(b, 'pt-BR'));
             }
 
             // Format with quotes
             const quote = useDoubleQuotes ? '"' : "'";
-            const formatted = cities.map(city => `${quote}${city}${quote}`).join(', ');
+            const formatted = dataItems.map(item => `${quote}${item}${quote}`).join(', ');
 
             // Update output
-            document.getElementById('cityOutput').value = formatted;
+            document.getElementById('dataOutput').value = formatted;
             
             // Update statistics
-            updateStatistics(cities.length, formatted.length);
+            updateStatistics(dataItems.length, formatted.length);
             
-            showNotification('Lista formatada com sucesso!', 'success');
+            showNotification('Array formatado com sucesso!', 'success');
         }
 
-        function updateStatistics(totalCities, totalChars) {
-            document.getElementById('totalCities').textContent = totalCities;
+        function updateStatistics(totalItems, totalChars) {
+            document.getElementById('totalItems').textContent = totalItems;
             document.getElementById('totalChars').textContent = totalChars;
             document.getElementById('duplicatesRemoved').textContent = duplicatesCount;
             document.getElementById('statistics').classList.remove('hidden');
         }
 
         function copyToClipboard() {
-            const output = document.getElementById('cityOutput');
+            const output = document.getElementById('dataOutput');
             if (!output.value) {
                 showNotification('Nada para copiar!', 'warning');
                 return;
@@ -387,7 +387,7 @@
         }
 
         function downloadAsFile() {
-            const output = document.getElementById('cityOutput').value;
+            const output = document.getElementById('dataOutput').value;
             if (!output) {
                 showNotification('Nada para baixar!', 'warning');
                 return;
@@ -397,7 +397,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'cidades_formatadas.txt';
+            a.download = 'array_formatado.txt';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -407,24 +407,26 @@
         }
 
         function clearAll() {
-            document.getElementById('cityInput').value = '';
-            document.getElementById('cityOutput').value = '';
+            document.getElementById('dataInput').value = '';
+            document.getElementById('dataOutput').value = '';
             document.getElementById('statistics').classList.add('hidden');
-            originalCities = [];
+            originalData = [];
             duplicatesCount = 0;
             showNotification('Tudo limpo!', 'info');
         }
 
         function clearInput() {
-            document.getElementById('cityInput').value = '';
+            document.getElementById('dataInput').value = '';
             showNotification('Entrada limpa!', 'info');
         }
 
         function loadExample() {
-            const example = `dados1
-            dados2
-            dados3`;
-            document.getElementById('cityInput').value = example;
+            const example = `item1
+item2
+item3
+item4
+item5`;
+            document.getElementById('dataInput').value = example;
             showNotification('Exemplo carregado!', 'success');
         }
 
@@ -452,16 +454,16 @@
         }
 
         // Auto-format on Enter key (with Ctrl/Cmd)
-        document.getElementById('cityInput').addEventListener('keydown', function(e) {
+        document.getElementById('dataInput').addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                formatCities();
+                formatData();
             }
         });
 
         // Auto-clear output when input changes
-        document.getElementById('cityInput').addEventListener('input', function() {
+        document.getElementById('dataInput').addEventListener('input', function() {
             if (this.value === '') {
-                document.getElementById('cityOutput').value = '';
+                document.getElementById('dataOutput').value = '';
                 document.getElementById('statistics').classList.add('hidden');
             }
         });
