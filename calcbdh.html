@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Banco de Horas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2d4a9c, #4a69bd);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(90deg, #4a69bd, #1e3799);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #1a2a6c;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #f9f9f9;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4a69bd;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(74, 105, 189, 0.2);
+        }
+        
+        .time-input {
+            position: relative;
+        }
+        
+        .time-input i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+        
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .col {
+            flex: 1;
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #4a69bd, #1e3799);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(74, 105, 189, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(74, 105, 189, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa, #e4e8f0);
+            border-radius: 15px;
+            text-align: center;
+            border-left: 5px solid #4a69bd;
+            display: none;
+        }
+        
+        .result-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .result-time {
+            font-size: 42px;
+            font-weight: 700;
+            color: #1a2a6c;
+            margin: 15px 0;
+            letter-spacing: 2px;
+        }
+        
+        .result-message {
+            font-size: 16px;
+            color: #555;
+            margin-top: 10px;
+        }
+        
+        .info-box {
+            background: #e8f4fc;
+            border-left: 4px solid #4a69bd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .info-box i {
+            color: #4a69bd;
+            margin-right: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #777;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .result-time {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-clock"></i> Calculadora de Banco de Horas</h1>
+        
+        <div class="info-box">
+            <i class="fas fa-info-circle"></i> 
+            Preencha os campos abaixo para calcular seu horário de saída
+        </div>
+        
+        <form id="calculatorForm">
+            <div class="form-group">
+                <label for="entrada">Horário de Entrada</label>
+                <div class="time-input">
+                    <input type="time" id="entrada" required>
+                    <i class="fas fa-sign-in-alt"></i>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Jornada de Trabalho</label>
+                <div class="row">
+                    <div class="col">
+                        <input type="number" id="jornada-horas" min="0" max="12" placeholder="Horas" required>
+                    </div>
+                    <div class="col">
+                        <input type="number" id="jornada-minutos" min="0" max="59" placeholder="Minutos" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Banco de Horas</label>
+                <div class="row">
+                    <div class="col">
+                        <input type="number" id="banco-horas" placeholder="Horas" required>
+                    </div>
+                    <div class="col">
+                        <input type="number" id="banco-minutos" min="0" max="59" placeholder="Minutos" required>
+                    </div>
+                </div>
+                <small style="color: #777; margin-top: 5px; display: block;">
+                    <i class="fas fa-exclamation-circle"></i> 
+                    Use valores negativos para débito (ex: -2 para 2 horas de débito)
+                </small>
+            </div>
+            
+            <button type="submit" class="btn">
+                <i class="fas fa-calculator"></i> Calcular Horário de Saída
+            </button>
+        </form>
+        
+        <div id="resultContainer" class="result-container">
+            <div class="result-title">Seu horário de saída deve ser:</div>
+            <div id="resultTime" class="result-time">--:--</div>
+            <div id="resultMessage" class="result-message"></div>
+        </div>
+        
+        <div class="footer">
+            <p>Calculadora de Banco de Horas &copy; 2023</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Obter valores do formulário
+            const entrada = document.getElementById('entrada').value;
+            const jornadaHoras = parseInt(document.getElementById('jornada-horas').value) || 0;
+            const jornadaMinutos = parseInt(document.getElementById('jornada-minutos').value) || 0;
+            const bancoHoras = parseInt(document.getElementById('banco-horas').value) || 0;
+            const bancoMinutos = parseInt(document.getElementById('banco-minutos').value) || 0;
+            
+            // Converter entrada para minutos
+            const [entradaHoras, entradaMinutos] = entrada.split(':').map(Number);
+            const totalMinutosEntrada = entradaHoras * 60 + entradaMinutos;
+            
+            // Converter jornada para minutos
+            const totalMinutosJornada = jornadaHoras * 60 + jornadaMinutos;
+            
+            // Converter banco para minutos
+            const totalMinutosBanco = bancoHoras * 60 + bancoMinutos;
+            
+            // Calcular hora de saída
+            const totalMinutosSaida = totalMinutosEntrada + totalMinutosJornada - totalMinutosBanco;
+            
+            // Converter de volta para horas e minutos
+            let horasSaida = Math.floor(totalMinutosSaida / 60);
+            const minutosSaida = totalMinutosSaida % 60;
+            
+            // Ajustar formato 24h
+            horasSaida = horasSaida % 24;
+            
+            // Formatar saída
+            const saidaFormatada = `${horasSaida.toString().padStart(2, '0')}:${minutosSaida.toString().padStart(2, '0')}`;
+            
+            // Exibir resultado
+            document.getElementById('resultTime').textContent = saidaFormatada;
+            
+            // Mensagem personalizada
+            let mensagem = "";
+            if (totalMinutosBanco > 0) {
+                const horasBanco = Math.floor(Math.abs(totalMinutosBanco) / 60);
+                const minutosBanco = Math.abs(totalMinutosBanco) % 60;
+                mensagem = `Você usou ${horasBanco}h${minutosBanco}m do seu banco de horas`;
+            } else if (totalMinutosBanco < 0) {
+                const horasBanco = Math.floor(Math.abs(totalMinutosBanco) / 60);
+                const minutosBanco = Math.abs(totalMinutosBanco) % 60;
+                mensagem = `Você acumulou ${horasBanco}h${minutosBanco}m no banco de horas`;
+            } else {
+                mensagem = "Você não usou nem acumulou horas no banco";
+            }
+            
+            document.getElementById('resultMessage').textContent = mensagem;
+            document.getElementById('resultContainer').style.display = 'block';
+            
+            // Rolagem suave para o resultado
+            document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
