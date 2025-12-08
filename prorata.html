@@ -3,416 +3,519 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Planilha de Vencimento</title>
+    <title>Calculadora Pro-Rata</title>
     <style>
-        * {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            box-sizing: border-box;
+        :root {
+            --primary-color: #f15a29; /* Orange/Red from screenshot */
+            --header-text: #ffffff;
+            --border-color: #ddd;
+            --bg-color: #f9f9f9;
         }
-        
+
         body {
-            background-color: #f5f7fa;
-            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
             margin: 0;
             padding: 20px;
-            line-height: 1.6;
+            color: #333;
         }
-        
+
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
         }
-        
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
+
+        @media(min-width: 768px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
         }
-        
-        .section {
-            margin-bottom: 30px;
+
+        .card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: var(--header-text);
+            padding: 10px 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-row {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .label-col {
+            flex: 1;
+            padding: 12px 15px;
+            background-color: #fff;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .value-col {
+            flex: 0 0 150px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            background-color: #fff;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        .read-only {
+            background-color: transparent;
+            border: none;
+            font-weight: bold;
+            color: #333;
+            text-align: right;
+            width: 100%;
+        }
+
+        .highlight-blue {
+            background-color: #e8f0fe;
         }
         
         .section-title {
-            color: #3498db;
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        
-        button {
-            background-color: #e74c3c;
+            background-color: #ff7e50;
             color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: background-color 0.3s;
-            margin-top: 10px;
-        }
-        
-        button:hover {
-            background-color: #c0392b;
-        }
-        
-        .logic-explanation {
-            background-color: #f8f9fa;
-            border-left: 4px solid #3498db;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 0 4px 4px 0;
-        }
-        
-        .formula {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #f0f0f0;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-        
-        .interface-panel {
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .interface-row {
-            display: flex;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-        
-        .interface-label {
-            width: 220px;
-            font-weight: 600;
-        }
-        
-        .interface-value {
-            flex: 1;
-        }
-        
-        .result-panel {
-            background-color: #f0f8ff;
-            border: 1px solid #b3d9ff;
-            border-radius: 8px;
-            padding: 20px;
-        }
-        
-        .result-row {
-            display: flex;
-            margin-bottom: 10px;
-            padding: 8px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .result-label {
-            width: 220px;
-            font-weight: 600;
-        }
-        
-        .result-value {
-            flex: 1;
-            font-weight: 500;
-        }
-        
-        .grid-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .grid-container {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .info-box {
-            background-color: #e8f4fd;
-            border-left: 4px solid #3498db;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 0 4px 4px 0;
-        }
-        
-        .date-info {
+            padding: 5px 15px;
             font-size: 0.9em;
-            color: #666;
-            margin-top: 5px;
         }
-        
-        .example-box {
-            background-color: #f0f8ff;
-            border: 1px solid #b3d9ff;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
+
+        /* Support Table Styling similar to screenshot right side */
+        .support-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
         }
-        
-        .example-title {
-            font-weight: 600;
-            color: #3498db;
-            margin-bottom: 10px;
+        .support-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px;
+            text-align: center;
         }
-        
-        .highlight {
-            background-color: #fff9c4 !important;
+        .support-table td {
+            border: 1px solid #eee;
+            padding: 6px;
+            text-align: center;
+        }
+        .highlight-row {
+            background-color: #e8f0fe;
             font-weight: bold;
         }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Simulador de Planilha de Vencimento</h1>
+
+<div class="container">
+    
+    <!-- Left Column: Inputs and Main Results -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
         
-        <div class="logic-explanation">
-            <h3>Explicação da Lógica:</h3>
-            <p>O sistema calcula o novo ciclo com base na data de solicitação e no novo dia de vencimento. O valor da próxima fatura é calculado proporcionalmente aos dias de uso no novo ciclo.</p>
-        </div>
-        
-        <div class="info-box">
-            <p><strong>Informações:</strong> Selecione o dia de vencimento atual e o novo dia de vencimento. O sistema calculará automaticamente o novo ciclo, datas e valores.</p>
-        </div>
-        
-        <div class="interface-panel">
-            <div class="grid-container">
-                <div>
-                    <div class="interface-row">
-                        <div class="interface-label">Vencimento atual:</div>
-                        <div class="interface-value">
-                            <select id="currentDueDay">
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                                <option value="15">15</option>
-                                <option value="20" selected>20</option>
-                                <option value="25">25</option>
-                                <option value="30">30</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="interface-row">
-                        <div class="interface-label">Novo vencimento:</div>
-                        <div class="interface-value">
-                            <select id="newDueDay">
-                                <option value="5" selected>5</option>
-                                <option value="10">10</option>
-                                <option value="15">15</option>
-                                <option value="20">20</option>
-                                <option value="25">25</option>
-                                <option value="30">30</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="interface-row">
-                        <div class="interface-label">Valor do plano (R$):</div>
-                        <div class="interface-value">
-                            <input type="number" id="planValue" step="0.01" value="50.00">
-                        </div>
-                    </div>
+        <!-- Input Table -->
+        <div class="card">
+            <div class="card-header">
+                <span>Tabela de calculo</span>
+                <span>⚙️</span>
+            </div>
+            <div class="section-title" style="display:flex; justify-content:space-between;">
+                <span>Dados atuais</span>
+                <span>Valor</span>
+            </div>
+            
+            <div class="table-row">
+                <div class="label-col">Data de solicitação</div>
+                <div class="value-col">
+                    <input type="date" id="reqDate">
                 </div>
-                
-                <div>
-                    <div class="interface-row">
-                        <div class="interface-label">Data de solicitação:</div>
-                        <div class="interface-value">
-                            <input type="date" id="requestDate" value="2025-12-08">
-                            <div class="date-info">Padrão: dia atual</div>
-                        </div>
-                    </div>
-                    
-                    <div class="interface-row">
-                        <div class="interface-label">Mês/Ano de referência:</div>
-                        <div class="interface-value">
-                            <input type="month" id="referenceMonth" value="2025-12">
-                        </div>
-                    </div>
-                    
-                    <div class="interface-row">
-                        <div class="interface-label"></div>
-                        <div class="interface-value">
-                            <button id="calculateBtn">Novos dados</button>
-                        </div>
-                    </div>
+            </div>
+            <div class="table-row">
+                <div class="label-col">Valor do plano</div>
+                <div class="value-col">
+                    <input type="number" id="planValue" value="30.00" step="0.01">
+                </div>
+            </div>
+            <div class="table-row">
+                <div class="label-col">Vencimento atual</div>
+                <div class="value-col">
+                    <select id="currentDue">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20" selected>20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-row">
+                <div class="label-col">Novo vencimento</div>
+                <div class="value-col">
+                    <select id="newDue">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30" selected>30</option>
+                    </select>
                 </div>
             </div>
         </div>
-        
-        <div class="result-panel">
-            <div class="result-row">
-                <div class="result-label">Novo ciclo:</div>
-                <div class="result-value" id="cycleResult">-</div>
+
+        <!-- Result Table -->
+        <div class="card">
+            <div class="card-header">
+                <span>Tabela de resultados</span>
+                <span>⚡</span>
             </div>
-            
-            <div class="result-row">
-                <div class="result-label">Início do novo ciclo:</div>
-                <div class="result-value" id="startCycleResult">-</div>
+            <div class="section-title" style="display:flex; justify-content:space-between;">
+                <span>Novos dados</span>
+                <span>Valor</span>
             </div>
-            
-            <div class="result-row">
-                <div class="result-label">Fim do novo ciclo:</div>
-                <div class="result-value" id="endCycleResult">-</div>
+
+            <div class="table-row highlight-blue">
+                <div class="label-col">Novo ciclo (código)</div>
+                <div class="value-col">
+                    <input type="text" id="newCycleCode" class="read-only" readonly>
+                </div>
             </div>
-            
-            <div class="result-row">
-                <div class="result-label">Próximo vencimento:</div>
-                <div class="result-value" id="nextDueDateResult">-</div>
+            <div class="table-row">
+                <div class="label-col">Inicio do novo ciclo</div>
+                <div class="value-col">
+                    <input type="text" id="newCycleStart" class="read-only" readonly>
+                </div>
             </div>
-            
-            <div class="result-row">
-                <div class="result-label">Dias de uso:</div>
-                <div class="result-value" id="usageDaysResult">-</div>
+            <div class="table-row">
+                <div class="label-col">Fim do novo ciclo</div>
+                <div class="value-col">
+                    <input type="text" id="newCycleEnd" class="read-only" readonly>
+                </div>
             </div>
-            
-            <div class="result-row">
-                <div class="result-label">Valor da próxima fatura:</div>
-                <div class="result-value" id="invoiceValueResult">-</div>
+            <div class="table-row">
+                <div class="label-col">Próximo vencimento</div>
+                <div class="value-col">
+                    <input type="text" id="nextDueDate" class="read-only" readonly>
+                </div>
+            </div>
+            <div class="table-row">
+                <div class="label-col">Dias de uso</div>
+                <div class="value-col">
+                    <input type="text" id="daysUsed" class="read-only" readonly>
+                </div>
+            </div>
+            <div class="table-row" style="background-color: #fff3e0;">
+                <div class="label-col"><strong>Valor da próxima fatura</strong></div>
+                <div class="value-col">
+                    <input type="text" id="nextInvoiceValue" class="read-only" style="font-size: 1.1em; color: var(--primary-color);" readonly>
+                </div>
             </div>
         </div>
-        
-        <div class="example-box">
-            <div class="example-title">Exemplo de Cálculo (conforme a planilha):</div>
-            <p><strong>Entradas:</strong> Vencimento atual: 20, Novo vencimento: 5, Valor do plano: R$ 50,00, Data de solicitação: 08/12/2025</p>
-            <p><strong>Resultados:</strong> Novo ciclo: 3, Início: 21/12/2025, Fim: 20/01/2026, Próximo vencimento: 05/02/2026, Dias de uso: 19, Valor da fatura: R$ 30,65</p>
-        </div>
+
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Definir data atual como padrão para data de solicitação
-            const today = new Date();
-            const formattedToday = formatDateForInput(today);
-            document.getElementById('requestDate').value = formattedToday;
-            
-            // Exibir a data atual formatada como informação
-            const todayFormatted = formatDateForDisplay(today);
-            document.querySelector('.date-info').innerHTML = `Padrão: dia atual (${todayFormatted})`;
-            
-            // Definir mês/ano de referência como dezembro/2025
-            document.getElementById('referenceMonth').value = '2025-12';
-            
-            const calculateBtn = document.getElementById('calculateBtn');
-            const currentDueDaySelect = document.getElementById('currentDueDay');
-            const newDueDaySelect = document.getElementById('newDueDay');
-            const referenceMonthInput = document.getElementById('referenceMonth');
-            
-            // Calcular automaticamente ao carregar a página
-            calculateResults();
-            
-            calculateBtn.addEventListener('click', calculateResults);
-            currentDueDaySelect.addEventListener('change', calculateResults);
-            newDueDaySelect.addEventListener('change', calculateResults);
-            referenceMonthInput.addEventListener('change', calculateResults);
-            
-            // Adicionar listeners para todos os inputs
-            document.getElementById('planValue').addEventListener('input', calculateResults);
-            document.getElementById('requestDate').addEventListener('change', calculateResults);
-            
-            function calculateResults() {
-                const currentDueDay = parseInt(currentDueDaySelect.value);
-                const newDueDay = parseInt(newDueDaySelect.value);
-                const planValue = parseFloat(document.getElementById('planValue').value);
-                const requestDate = new Date(document.getElementById('requestDate').value);
-                const referenceMonth = referenceMonthInput.value; // Formato: YYYY-MM
-                
-                // Extrair ano e mês do mês de referência
-                const [year, month] = referenceMonth.split('-').map(Number);
-                
-                // Início do novo ciclo: dia seguinte ao vencimento atual no mês de referência
-                const startCycle = new Date(year, month - 1, currentDueDay + 1);
-                
-                // Fim do novo ciclo: dia do vencimento atual no mês seguinte
-                const endCycle = new Date(year, month, currentDueDay);
-                
-                // Próximo vencimento: dia do novo vencimento no segundo mês seguinte ao mês de referência
-                const nextDueDate = new Date(year, month + 1, newDueDay);
-                
-                // Dias de uso: apenas os dias do mês seguinte ao mês de referência, de 01 até o dia anterior ao fim do novo ciclo
-                const usageDays = endCycle.getDate() - 1; // Porque o fim do novo ciclo é o dia do vencimento atual, e não inclui esse dia
-                
-                // Valor da próxima fatura: (valor do plano / dias do mês de referência) * dias de uso
-                const daysInReferenceMonth = new Date(year, month, 0).getDate(); // Dias no mês de referência
-                const dailyRate = planValue / daysInReferenceMonth;
-                const invoiceValue = dailyRate * usageDays;
-                
-                // Formatar datas para exibição
-                const formattedStartCycle = formatDateForDisplay(startCycle);
-                const formattedEndCycle = formatDateForDisplay(endCycle);
-                const formattedNextDueDate = formatDateForDisplay(nextDueDate);
-                
-                // Atualizar a interface de resultados
-                document.getElementById('cycleResult').textContent = "3"; // Fixo conforme o exemplo
-                document.getElementById('startCycleResult').textContent = formattedStartCycle;
-                document.getElementById('endCycleResult').textContent = formattedEndCycle;
-                document.getElementById('nextDueDateResult').textContent = formattedNextDueDate;
-                document.getElementById('usageDaysResult').textContent = usageDays;
-                document.getElementById('invoiceValueResult').textContent = `R$ ${invoiceValue.toFixed(2).replace('.', ',')}`;
-            }
-            
-            function formatDateForInput(date) {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            }
-            
-            function formatDateForDisplay(date) {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                return `${day}/${month}/${year}`;
-            }
-        });
+    <!-- Right Column: Support Data (Visualizing the Logic) -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
         
-        function openTab(evt, tabName) {
-            // Ocultar todos os conteúdos das abas
-            const tabContents = document.getElementsByClassName('tab-content');
-            for (let i = 0; i < tabContents.length; i++) {
-                tabContents[i].classList.remove('active');
-            }
-            
-            // Remover a classe 'active' de todos os botões de aba
-            const tabs = document.getElementsByClassName('tab');
-            for (let i = 0; i < tabs.length; i++) {
-                tabs[i].classList.remove('active');
-            }
-            
-            // Mostrar a aba específica
-            document.getElementById(tabName).classList.add('active');
-            
-            // Adicionar a classe 'active' ao botão que abriu a aba
-            evt.currentTarget.classList.add('active');
+        <div class="card">
+            <div class="card-header">
+                <span>Tabela de suporte (Ciclo Atual)</span>
+                <span>📅</span>
+            </div>
+            <div class="table-row">
+                <div class="label-col">Fechamento do ciclo</div>
+                <div class="value-col">
+                    <input type="text" id="oldCycleClose" class="read-only" readonly>
+                </div>
+            </div>
+            <div class="table-row">
+                <div class="label-col">Inicio ciclo atual</div>
+                <div class="value-col">
+                    <input type="text" id="oldCycleStart" class="read-only" style="color:green;" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span>Simulação de Todos os Vencimentos</span>
+                <span>📊</span>
+            </div>
+            <table class="support-table" id="simulationTable">
+                <thead>
+                    <tr>
+                        <th>Vencimento</th>
+                        <th>Inicio Novo</th>
+                        <th>Dias Uso</th>
+                        <th>Valor Est.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    // Utility: Parse date string YYYY-MM-DD to Date object (local time safe)
+    function parseDate(str) {
+        const [y, m, d] = str.split('-').map(Number);
+        return new Date(y, m - 1, d);
+    }
+
+    // Utility: Format Date to DD/MM/YYYY
+    function formatDate(date) {
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const y = date.getFullYear();
+        return `${d}/${m}/${y}`;
+    }
+
+    // Logic: Get Cycle Closing Date based on formula provided
+    // =IFS(OR(C4=5;C4=10);SE(DIA(C2)>20;...); OR(C4=15;C4=20);SE(DIA(C2)>1;...); ...)
+    function getCycleClosing(refDate, dueDay) {
+        const year = refDate.getFullYear();
+        const month = refDate.getMonth(); // 0-indexed
+        const day = refDate.getDate();
+        
+        let cutoffDay = 0;
+        let triggerDay = 0;
+
+        dueDay = parseInt(dueDay);
+
+        if (dueDay === 5 || dueDay === 10) {
+            cutoffDay = 20;
+            triggerDay = 20;
+        } else if (dueDay === 15 || dueDay === 20) {
+            cutoffDay = 1;
+            triggerDay = 1;
+        } else if (dueDay === 25 || dueDay === 30) {
+            cutoffDay = 10;
+            triggerDay = 10;
         }
-    </script>
+
+        // Logic: If Day > Trigger, Next Month, Else This Month
+        // Note: JS Month is 0-11. 
+        // new Date(y, m+1, d) handles year rollover automatically.
+        
+        if (day > triggerDay) {
+            // Next Month
+            return new Date(year, month + 1, cutoffDay);
+        } else {
+            // This Month
+            return new Date(year, month, cutoffDay);
+        }
+    }
+
+    // Logic: Get Cycle Start Date
+    // =DATA(ANO; MES-1; DIA+1) -> Closing Date - 1 Month + 1 Day
+    function getCycleStart(closingDate) {
+        const d = new Date(closingDate);
+        d.setMonth(d.getMonth() - 1);
+        d.setDate(d.getDate() + 1);
+        return d;
+    }
+
+    // Logic: Calculate Days Difference
+    function getDiffDays(d1, d2) {
+        const oneDay = 24 * 60 * 60 * 1000;
+        return Math.round((d1 - d2) / oneDay);
+    }
+
+    function calculate() {
+        const reqDateStr = document.getElementById('reqDate').value;
+        const planValue = parseFloat(document.getElementById('planValue').value) || 0;
+        const currentDue = parseInt(document.getElementById('currentDue').value);
+        const newDue = parseInt(document.getElementById('newDue').value);
+
+        if (!reqDateStr) return;
+
+        const reqDate = parseDate(reqDateStr);
+
+        // 1. Determine OLD Cycle Data
+        const oldClosing = getCycleClosing(reqDate, currentDue);
+        const oldStart = getCycleStart(oldClosing);
+
+        // Update UI for Old Cycle
+        document.getElementById('oldCycleClose').value = formatDate(oldClosing);
+        document.getElementById('oldCycleStart').value = formatDate(oldStart);
+
+        // 2. Determine NEW Cycle Data
+        // To match the screenshot logic (Venc 30 -> 11/01/2026 for Req 08/12),
+        // we find a New Cycle Start that creates a "valid" pro-rata period (usually > ~10 days).
+        
+        let validNewStart = null;
+        let validNewClosing = null;
+        let tempDate = new Date(reqDate); // Start search from request date
+
+        // Initial Candidate
+        let candidateClosing = getCycleClosing(tempDate, newDue);
+        let candidateStart = getCycleStart(candidateClosing);
+
+        // Logic Loop:
+        // If the calculated start is before or equal to Request Date, OR 
+        // if the gap (NewStart - OldStart) is surprisingly small (e.g., < 9 days), 
+        // bump to next cycle.
+        // Based on screenshot: Due 30 (Start 11/12/2025) was skipped (Gap 9 days).
+        // Due 5 (Start 21/12/2025) was kept (Gap 19 days).
+        // Threshold appears to be around 10 days.
+
+        while (true) {
+            const daysGap = getDiffDays(candidateStart, oldStart);
+            
+            // Criteria: Must be future relative to Old Start AND have minimum gap
+            // AND strictly > Request Date is usually implied but screenshot has overlapping dates logic.
+            // The safest bet matching the data is checking the Days Gap.
+            
+            if (candidateStart > reqDate || daysGap >= 10) {
+                 // Check if it's strictly in the past of request?
+                 // In screenshot, Due 5 starts 21/12, Req is 08/12. It is future.
+                 // Due 30 skipped 11/12 (which is future of 08/12) because gap was 9 days.
+                 if (daysGap >= 10) {
+                     validNewStart = candidateStart;
+                     validNewClosing = candidateClosing;
+                     break;
+                 }
+            }
+
+            // Move to next month
+            candidateClosing.setMonth(candidateClosing.getMonth() + 1);
+            candidateStart = getCycleStart(candidateClosing);
+            
+            // Safety break
+            if (getDiffDays(candidateStart, reqDate) > 365) break; 
+        }
+
+        const daysUsed = getDiffDays(validNewStart, oldStart);
+        
+        // Calculate Value
+        // Formula: (Plan / DaysInNewCycle) * DaysUsed
+        const daysInNewCycle = getDiffDays(validNewClosing, validNewStart) + 1; // Inclusive
+        const proRataValue = (planValue / daysInNewCycle) * daysUsed;
+        
+        // 3. Determine Next Due Date (Vencimento)
+        // Usually, the invoice due date is related to the Closing date.
+        // In screenshot: Closing 10/02/2026 -> Due 28/02/2026? 
+        // Due Day is 30. Feb has 28 days.
+        // Rule: Due Day of the Month of Closing (or Next Month?)
+        // Standard: If Closing 10, Due 30 (Same month).
+        // If Closing 20, Due 5 (Next month).
+        // Let's approximate based on input "Novo vencimento".
+        
+        let nextDueDate = new Date(validNewClosing);
+        // If Due Day > Closing Day, usually same month.
+        // If Due Day < Closing Day, next month.
+        if (newDue > validNewClosing.getDate()) {
+            // Same month as closing
+            // Handle end of month (e.g. Feb 30 -> Feb 28)
+            const lastDayOfMonth = new Date(nextDueDate.getFullYear(), nextDueDate.getMonth() + 1, 0).getDate();
+            const actualDay = Math.min(newDue, lastDayOfMonth);
+            nextDueDate.setDate(actualDay);
+        } else {
+            // Next month
+            nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+            const lastDayOfMonth = new Date(nextDueDate.getFullYear(), nextDueDate.getMonth() + 1, 0).getDate();
+            const actualDay = Math.min(newDue, lastDayOfMonth);
+            nextDueDate.setDate(actualDay);
+        }
+
+        // Update UI Results
+        document.getElementById('newCycleCode').value = "2"; // Static/Example code
+        document.getElementById('newCycleStart').value = formatDate(validNewStart);
+        document.getElementById('newCycleEnd').value = formatDate(validNewClosing);
+        document.getElementById('nextDueDate').value = formatDate(nextDueDate);
+        document.getElementById('daysUsed').value = daysUsed;
+        document.getElementById('nextInvoiceValue').value = proRataValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        // Update Simulation Table
+        updateSimulationTable(reqDate, oldStart, planValue);
+    }
+
+    function updateSimulationTable(reqDate, oldStart, planValue) {
+        const tbody = document.querySelector('#simulationTable tbody');
+        tbody.innerHTML = '';
+        const dues = [5, 10, 15, 20, 25, 30];
+        const selectedDue = parseInt(document.getElementById('newDue').value);
+
+        dues.forEach(simDue => {
+            // Logic replication for simulation
+            let tempClosing = getCycleClosing(reqDate, simDue);
+            let tempStart = getCycleStart(tempClosing);
+            
+            // Same loop as main function
+            while (true) {
+                const gap = getDiffDays(tempStart, oldStart);
+                if (gap >= 10) break; 
+                tempClosing.setMonth(tempClosing.getMonth() + 1);
+                tempStart = getCycleStart(tempClosing);
+            }
+
+            const days = getDiffDays(tempStart, oldStart);
+            const daysInCycle = getDiffDays(tempClosing, tempStart) + 1;
+            const val = (planValue / daysInCycle) * days;
+
+            const tr = document.createElement('tr');
+            if (simDue === selectedDue) tr.classList.add('highlight-row');
+            
+            tr.innerHTML = `
+                <td>${simDue}</td>
+                <td>${formatDate(tempStart)}</td>
+                <td>${days}</td>
+                <td>${val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set default Request Date to Today
+        const today = new Date();
+        document.getElementById('reqDate').valueAsDate = today;
+
+        // Add Listeners
+        const inputs = document.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('change', calculate);
+            input.addEventListener('input', calculate); // Instant update
+        });
+
+        // First Calculation
+        calculate();
+    });
+
+</script>
+
 </body>
 </html>
