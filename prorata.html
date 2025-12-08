@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Planilha de Vencimento</title>
+    <style>
+        * {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            color: #3498db;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        tr:hover {
+            background-color: #e9f7fe;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #c0392b;
+        }
+        
+        .highlight {
+            background-color: #fff9c4 !important;
+            font-weight: bold;
+        }
+        
+        .result-cell {
+            background-color: #e8f5e9;
+            font-weight: 600;
+        }
+        
+        .logic-explanation {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .formula {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f0f0f0;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+            font-weight: 600;
+            color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .interface-panel {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .interface-row {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .interface-label {
+            width: 200px;
+            font-weight: 600;
+        }
+        
+        .interface-value {
+            flex: 1;
+        }
+        
+        .result-panel {
+            background-color: #f0f8ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .result-row {
+            display: flex;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .result-label {
+            width: 200px;
+            font-weight: 600;
+        }
+        
+        .result-value {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .info-box {
+            background-color: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simulador de Planilha de Vencimento</h1>
+        
+        <div class="logic-explanation">
+            <h3>Explicação da Lógica:</h3>
+            <p>O sistema calcula o novo ciclo com base na data de solicitação e no novo dia de vencimento. O valor da próxima fatura é calculado proporcionalmente aos dias de uso no novo ciclo.</p>
+        </div>
+        
+        <div class="info-box">
+            <p><strong>Informações:</strong> Selecione o dia de vencimento atual e o novo dia de vencimento. O sistema calculará automaticamente o novo ciclo, datas e valores.</p>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="openTab(event, 'interface-tab')">Interface</div>
+            <div class="tab" onclick="openTab(event, 'support-tab')">Tabela de Suporte</div>
+            <div class="tab" onclick="openTab(event, 'calc-tab')">Tabela de Cálculo</div>
+        </div>
+        
+        <div id="interface-tab" class="tab-content active">
+            <div class="interface-panel">
+                <div class="grid-container">
+                    <div>
+                        <div class="interface-row">
+                            <div class="interface-label">Vencimento atual:</div>
+                            <div class="interface-value">
+                                <select id="currentDueDay">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="15">15</option>
+                                    <option value="20" selected>20</option>
+                                    <option value="25">25</option>
+                                    <option value="30">30</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="interface-row">
+                            <div class="interface-label">Novo vencimento:</div>
+                            <div class="interface-value">
+                                <select id="newDueDay">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="15">15</option>
+                                    <option value="20">20</option>
+                                    <option value="25">25</option>
+                                    <option value="30" selected>30</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="interface-row">
+                            <div class="interface-label">Valor do plano (R$):</div>
+                            <div class="interface-value">
+                                <input type="number" id="planValue" step="0.01" value="50.00">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="interface-row">
+                            <div class="interface-label">Data de solicitação:</div>
+                            <div class="interface-value">
+                                <input type="date" id="requestDate">
+                            </div>
+                        </div>
+                        
+                        <div class="interface-row">
+                            <div class="interface-label">Mês/Ano de referência:</div>
+                            <div class="interface-value">
+                                <input type="month" id="referenceMonth" value="2025-12">
+                            </div>
+                        </div>
+                        
+                        <div class="interface-row">
+                            <div class="interface-label"></div>
+                            <div class="interface-value">
+                                <button id="calculateBtn">Novos dados</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-panel">
+                <div class="result-row">
+                    <div class="result-label">Novo ciclo:</div>
+                    <div class="result-value" id="cycleResult">-</div>
+                </div>
+                
+                <div class="result-row">
+                    <div class="result-label">Início do novo ciclo:</div>
+                    <div class="result-value" id="startCycleResult">-</div>
+                </div>
+                
+                <div class="result-row">
+                    <div class="result-label">Fim do novo ciclo:</div>
+                    <div class="result-value" id="endCycleResult">-</div>
+                </div>
+                
+                <div class="result-row">
+                    <div class="result-label">Próximo vencimento:</div>
+                    <div class="result-value" id="nextDueDateResult">-</div>
+                </div>
+                
+                <div class="result-row">
+                    <div class="result-label">Dias de uso:</div>
+                    <div class="result-value" id="usageDaysResult">-</div>
+                </div>
+                
+                <div class="result-row">
+                    <div class="result-label">Valor da próxima fatura:</div>
+                    <div class="result-value" id="invoiceValueResult">-</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="support-tab" class="tab-content">
+            <h2 class="section-title">Tabela de Suporte 2_50</h2>
+            <table id="supportTable">
+                <thead>
+                    <tr>
+                        <th>Vencimento (H)</th>
+                        <th>Ciclo (I)</th>
+                        <th>Início do Ciclo (J)</th>
+                        <th>Fim do Ciclo (K)</th>
+                        <th>Dias de Uso (L)</th>
+                        <th>Próximo Vencimento (M)</th>
+                        <th>Valor da Próxima Fatura (N)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>5</td>
+                        <td>1</td>
+                        <td>01/12/2025</td>
+                        <td>05/12/2025</td>
+                        <td>5</td>
+                        <td>05/01/2026</td>
+                        <td>R$ 29.99</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>2</td>
+                        <td>06/12/2025</td>
+                        <td>10/12/2025</td>
+                        <td>5</td>
+                        <td>10/01/2026</td>
+                        <td>R$ 25.50</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>3</td>
+                        <td>11/12/2025</td>
+                        <td>15/12/2025</td>
+                        <td>5</td>
+                        <td>15/01/2026</td>
+                        <td>R$ 22.75</td>
+                    </tr>
+                    <tr>
+                        <td>20</td>
+                        <td>4</td>
+                        <td>16/12/2025</td>
+                        <td>20/12/2025</td>
+                        <td>5</td>
+                        <td>20/01/2026</td>
+                        <td>R$ 20.32</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>5</td>
+                        <td>21/12/2025</td>
+                        <td>25/12/2025</td>
+                        <td>5</td>
+                        <td>25/01/2026</td>
+                        <td>R$ 18.40</td>
+                    </tr>
+                    <tr>
+                        <td>30</td>
+                        <td>6</td>
+                        <td>26/12/2025</td>
+                        <td>30/12/2025</td>
+                        <td>5</td>
+                        <td>30/01/2026</td>
+                        <td>R$ 16.80</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="calc-tab" class="tab-content">
+            <h2 class="section-title">Tabela de Cálculo_50</h2>
+            <table id="calcTable">
+                <thead>
+                    <tr>
+                        <th>Vencimento</th>
+                        <th>Início do novo ciclo</th>
+                        <th>Fim do novo ciclo</th>
+                        <th>Próximo vencimento</th>
+                        <th>Dias de uso</th>
+                        <th>Valor da próxima fatura</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>05/12/2025</td>
+                        <td>06/12/2025</td>
+                        <td>19/12/2025</td>
+                        <td>20/12/2025</td>
+                        <td>14</td>
+                        <td>R$ 29.99</td>
+                    </tr>
+                    <tr>
+                        <td>20/12/2025</td>
+                        <td>21/12/2025</td>
+                        <td>04/01/2026</td>
+                        <td>05/01/2026</td>
+                        <td>15</td>
+                        <td>R$ 20.32</td>
+                    </tr>
+                    <tr>
+                        <td>05/01/2026</td>
+                        <td>06/01/2026</td>
+                        <td>19/01/2026</td>
+                        <td>20/01/2026</td>
+                        <td>14</td>
+                        <td>R$ 29.99</td>
+                    </tr>
+                    <tr>
+                        <td>20/01/2026</td>
+                        <td>21/01/2026</td>
+                        <td>04/02/2026</td>
+                        <td>05/02/2026</td>
+                        <td>15</td>
+                        <td>R$ 20.32</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Definir data atual como padrão para data de solicitação
+            const today = new Date();
+            const formattedToday = formatDate(today);
+            document.getElementById('requestDate').value = formattedToday;
+            
+            // Definir mês/ano de referência como dezembro/2025
+            document.getElementById('referenceMonth').value = '2025-12';
+            
+            const calculateBtn = document.getElementById('calculateBtn');
+            const currentDueDaySelect = document.getElementById('currentDueDay');
+            const newDueDaySelect = document.getElementById('newDueDay');
+            const referenceMonthInput = document.getElementById('referenceMonth');
+            
+            // Calcular automaticamente ao carregar a página
+            calculateResults();
+            
+            calculateBtn.addEventListener('click', calculateResults);
+            currentDueDaySelect.addEventListener('change', calculateResults);
+            newDueDaySelect.addEventListener('change', calculateResults);
+            referenceMonthInput.addEventListener('change', calculateResults);
+            
+            // Adicionar listeners para todos os inputs
+            document.getElementById('planValue').addEventListener('input', calculateResults);
+            document.getElementById('requestDate').addEventListener('change', calculateResults);
+            
+            function calculateResults() {
+                const currentDueDay = parseInt(currentDueDaySelect.value);
+                const newDueDay = parseInt(newDueDaySelect.value);
+                const planValue = parseFloat(document.getElementById('planValue').value);
+                const requestDate = new Date(document.getElementById('requestDate').value);
+                const referenceMonth = referenceMonthInput.value; // Formato: YYYY-MM
+                
+                // Extrair ano e mês do mês de referência
+                const [year, month] = referenceMonth.split('-').map(Number);
+                
+                // Criar data do vencimento atual com base no mês de referência
+                const currentDueDate = new Date(year, month - 1, currentDueDay);
+                
+                // Criar data do novo vencimento com base no mês de referência
+                let newDueDate = new Date(year, month - 1, newDueDay);
+                
+                // Se o novo vencimento for antes da data de solicitação, ajustar para o próximo mês
+                if (newDueDate < requestDate) {
+                    newDueDate = new Date(year, month, newDueDay);
+                }
+                
+                // Calcular o novo ciclo
+                const startCycle = new Date(requestDate);
+                startCycle.setDate(startCycle.getDate() + 1); // Dia seguinte à solicitação
+                
+                const endCycle = new Date(newDueDate);
+                
+                // Calcular o próximo vencimento
+                const nextDueDate = new Date(newDueDate);
+                nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+                
+                // Calcular dias de uso
+                const timeDiff = endCycle.getTime() - startCycle.getTime();
+                const usageDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                
+                // Calcular valor da próxima fatura (proporcional)
+                const dailyRate = planValue / 30;
+                const invoiceValue = dailyRate * usageDays;
+                
+                // Formatar datas para exibição
+                const formattedStartCycle = formatDate(startCycle);
+                const formattedEndCycle = formatDate(endCycle);
+                const formattedNextDueDate = formatDate(nextDueDate);
+                
+                // Atualizar a interface de resultados
+                document.getElementById('cycleResult').textContent = `${newDueDay}`;
+                document.getElementById('startCycleResult').textContent = formattedStartCycle;
+                document.getElementById('endCycleResult').textContent = formattedEndCycle;
+                document.getElementById('nextDueDateResult').textContent = formattedNextDueDate;
+                document.getElementById('usageDaysResult').textContent = usageDays;
+                document.getElementById('invoiceValueResult').textContent = `R$ ${invoiceValue.toFixed(2).replace('.', ',')}`;
+                
+                // Destacar a linha correspondente na tabela de suporte
+                const allRows = document.querySelectorAll('#supportTable tbody tr');
+                allRows.forEach(row => row.classList.remove('highlight'));
+                
+                // Encontrar a linha com o dia de vencimento correspondente
+                for (let i = 0; i < allRows.length; i++) {
+                    const rowDueDay = parseInt(allRows[i].cells[0].textContent);
+                    if (rowDueDay === newDueDay) {
+                        allRows[i].classList.add('highlight');
+                        break;
+                    }
+                }
+            }
+            
+            function formatDate(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${day}/${month}/${year}`;
+            }
+        });
+        
+        function openTab(evt, tabName) {
+            // Ocultar todos os conteúdos das abas
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Remover a classe 'active' de todos os botões de aba
+            const tabs = document.getElementsByClassName('tab');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            // Mostrar a aba específica
+            document.getElementById(tabName).classList.add('active');
+            
+            // Adicionar a classe 'active' ao botão que abriu a aba
+            evt.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>
