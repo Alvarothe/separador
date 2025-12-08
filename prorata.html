@@ -3,58 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Pro-Rata</title>
+    <title>Calculadora Pro-Rata (Corrigida)</title>
+    <!-- Import Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary-color: #f15a29; /* Orange/Red from screenshot */
+            --primary-color: #f15a29;
             --header-text: #ffffff;
             --border-color: #ddd;
-            --bg-color: #f9f9f9;
+            --bg-color: #f2f2f2;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #ffffff;
+            background-color: var(--bg-color);
             margin: 0;
-            padding: 20px;
+            padding: 40px 20px;
             color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            width: 100%;
+            max-width: 1100px;
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
+            grid-template-columns: 1fr; /* Mobile */
+            gap: 25px;
+            background-color: transparent;
         }
 
-        @media(min-width: 768px) {
+        @media(min-width: 850px) {
             .container {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr 1fr; /* Desktop: 2 Colunas */
+                align-items: stretch; /* Garante que a estrutura da grade tenha a mesma altura */
             }
+        }
+
+        /* Configuração das Colunas para preenchimento total */
+        .column {
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Ocupa toda a altura disponível na grade */
         }
 
         .card {
             background: #fff;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            overflow: hidden; /* Importante para o border-radius */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            position: relative; /* Contexto de empilhamento */
         }
 
+        /* --- CORREÇÃO VISUAL DO CABEÇALHO --- */
         .card-header {
             background-color: var(--primary-color);
             color: var(--header-text);
-            padding: 10px 15px;
+            padding: 12px 20px;
             font-weight: bold;
+            font-size: 1.05em;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            /* As linhas abaixo corrigem a sobreposição branca */
+            position: relative; 
+            z-index: 10; 
+            box-shadow: 0 1px 0 rgba(0,0,0,0.1); 
+        }
+
+        /* Card que deve esticar para alinhar o fundo (Coluna Direita) */
+        .card.fill-space {
+            flex-grow: 1; /* Faz o card crescer para ocupar o espaço restante */
         }
 
         .table-row {
             display: flex;
+            align-items: center;
             border-bottom: 1px solid var(--border-color);
+            min-height: 45px;
+            background-color: #fff;
+            position: relative;
+            z-index: 1; /* Fica abaixo do header */
         }
 
         .table-row:last-child {
@@ -63,29 +99,50 @@
 
         .label-col {
             flex: 1;
-            padding: 12px 15px;
+            padding: 10px 20px;
             background-color: #fff;
             font-weight: 500;
             display: flex;
             align-items: center;
+            height: 100%;
         }
 
         .value-col {
-            flex: 0 0 150px;
-            padding: 8px 15px;
+            flex: 0 0 160px;
+            padding: 10px 20px;
             display: flex;
             align-items: center;
             justify-content: flex-end;
+            background-color: #fff;
+            height: 100%;
+        }
+        
+        .text-col {
+            flex: 2;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: left;
+            font-size: 0.85em;
+            color: #555;
+            line-height: 1.4;
             background-color: #fff;
         }
 
         input, select {
             width: 100%;
-            padding: 6px;
+            padding: 6px 10px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 6px;
             text-align: right;
             font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
         }
 
         .read-only {
@@ -95,20 +152,14 @@
             color: #333;
             text-align: right;
             width: 100%;
+            cursor: default;
         }
 
         .highlight-blue {
             background-color: #e8f0fe;
         }
-        
-        .section-title {
-            background-color: #ff7e50;
-            color: white;
-            padding: 5px 15px;
-            font-size: 0.9em;
-        }
 
-        /* Support Table Styling similar to screenshot right side */
+        /* Tabela de Simulação */
         .support-table {
             width: 100%;
             border-collapse: collapse;
@@ -117,37 +168,74 @@
         .support-table th {
             background-color: var(--primary-color);
             color: white;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
+            font-weight: 600;
         }
         .support-table td {
             border: 1px solid #eee;
-            padding: 6px;
+            padding: 8px;
             text-align: center;
+            color: #555;
         }
         .highlight-row {
             background-color: #e8f0fe;
+            color: #000 !important;
             font-weight: bold;
         }
+        
+        /* Mini tabela de explicação */
+        .logic-table {
+            width: 100%;
+            font-size: 0.85em;
+            border-top: 1px solid #eee;
+        }
+        .logic-table th {
+            text-align: left;
+            padding: 8px 20px;
+            background-color: #f9f9f9;
+            color: #666;
+            font-weight: 600;
+        }
+        .logic-table td {
+            padding: 8px 20px;
+            border-bottom: 1px solid #eee;
+        }
 
+        .chart-container {
+            position: relative; 
+            height: 280px; 
+            width: 100%; 
+            padding: 20px; 
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+        
+        /* Ícone de info */
+        .info-icon {
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            cursor: help;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     
-    <!-- Left Column: Inputs and Main Results -->
-    <div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Coluna Esquerda -->
+    <div class="column">
         
-        <!-- Input Table -->
         <div class="card">
             <div class="card-header">
-                <span>Tabela de calculo</span>
-                <span>⚙️</span>
-            </div>
-            <div class="section-title" style="display:flex; justify-content:space-between;">
-                <span>Dados atuais</span>
-                <span>Valor</span>
+                <span>Tabela de cálculo</span>
+                <span></span>
             </div>
             
             <div class="table-row">
@@ -190,15 +278,10 @@
             </div>
         </div>
 
-        <!-- Result Table -->
         <div class="card">
             <div class="card-header">
                 <span>Tabela de resultados</span>
-                <span>⚡</span>
-            </div>
-            <div class="section-title" style="display:flex; justify-content:space-between;">
-                <span>Novos dados</span>
-                <span>Valor</span>
+                <span></span>
             </div>
 
             <div class="table-row highlight-blue">
@@ -232,22 +315,75 @@
                 </div>
             </div>
             <div class="table-row" style="background-color: #fff3e0;">
-                <div class="label-col"><strong>Valor da próxima fatura</strong></div>
+                <div class="label-col"><strong style="color: var(--primary-color);">Valor da próxima fatura</strong></div>
                 <div class="value-col">
-                    <input type="text" id="nextInvoiceValue" class="read-only" style="font-size: 1.1em; color: var(--primary-color);" readonly>
+                    <input type="text" id="nextInvoiceValue" class="read-only" style="font-size: 1.2em; color: var(--primary-color);" readonly>
                 </div>
             </div>
         </div>
 
+        <!-- Card de Explicação -->
+        <div class="card fill-space">
+            <div class="card-header">
+                <span>Entenda a Lógica</span>
+                <div class="info-icon">i</div>
+            </div>
+            <div class="table-row">
+                <div class="label-col" style="flex:1;">Cálculo</div>
+                <div class="text-col">
+                    (Valor Plano ÷ Dias do Mês) × Dias de Uso
+                </div>
+            </div>
+            <div class="table-row">
+                <div class="label-col" style="flex:1;">Regra 10 dias</div>
+                <div class="text-col">
+                    O novo ciclo deve iniciar pelo menos 10 dias após o início do ciclo antigo.
+                </div>
+            </div>
+            
+            <table class="logic-table">
+                <thead>
+                    <tr>
+                        <th>Vencimento</th>
+                        <th>Dia do Corte (Fechamento)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>05 ou 10</td>
+                        <td>Dia 20 (Mês Anterior)</td>
+                    </tr>
+                    <tr>
+                        <td>15 ou 20</td>
+                        <td>Dia 01 (Mesmo Mês)</td>
+                    </tr>
+                    <tr>
+                        <td>25 ou 30</td>
+                        <td>Dia 10 (Mesmo Mês)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
-    <!-- Right Column: Support Data (Visualizing the Logic) -->
-    <div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Coluna Direita -->
+    <div class="column">
         
         <div class="card">
             <div class="card-header">
+                <span>Impacto e Normalização (Linha do Tempo)</span>
+                <span></span>
+            </div>
+            <div class="chart-container">
+                <canvas id="invoiceChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
                 <span>Tabela de suporte (Ciclo Atual)</span>
-                <span>📅</span>
+                <span></span>
             </div>
             <div class="table-row">
                 <div class="label-col">Fechamento do ciclo</div>
@@ -263,10 +399,11 @@
             </div>
         </div>
 
-        <div class="card">
+        <!-- Adicionei a classe 'fill-space' aqui para este card esticar -->
+        <div class="card fill-space">
             <div class="card-header">
                 <span>Simulação de Todos os Vencimentos</span>
-                <span>📊</span>
+                <span></span>
             </div>
             <table class="support-table" id="simulationTable">
                 <thead>
@@ -278,7 +415,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Populated by JS -->
+                    <!-- JS Preenche aqui -->
                 </tbody>
             </table>
         </div>
@@ -288,13 +425,13 @@
 </div>
 
 <script>
-    // Utility: Parse date string YYYY-MM-DD to Date object (local time safe)
+    let invoiceChart = null;
+
     function parseDate(str) {
         const [y, m, d] = str.split('-').map(Number);
         return new Date(y, m - 1, d);
     }
 
-    // Utility: Format Date to DD/MM/YYYY
     function formatDate(date) {
         const d = String(date.getDate()).padStart(2, '0');
         const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -302,11 +439,9 @@
         return `${d}/${m}/${y}`;
     }
 
-    // Logic: Get Cycle Closing Date based on formula provided
-    // =IFS(OR(C4=5;C4=10);SE(DIA(C2)>20;...); OR(C4=15;C4=20);SE(DIA(C2)>1;...); ...)
     function getCycleClosing(refDate, dueDay) {
         const year = refDate.getFullYear();
-        const month = refDate.getMonth(); // 0-indexed
+        const month = refDate.getMonth();
         const day = refDate.getDate();
         
         let cutoffDay = 0;
@@ -325,21 +460,13 @@
             triggerDay = 10;
         }
 
-        // Logic: If Day > Trigger, Next Month, Else This Month
-        // Note: JS Month is 0-11. 
-        // new Date(y, m+1, d) handles year rollover automatically.
-        
         if (day > triggerDay) {
-            // Next Month
             return new Date(year, month + 1, cutoffDay);
         } else {
-            // This Month
             return new Date(year, month, cutoffDay);
         }
     }
 
-    // Logic: Get Cycle Start Date
-    // =DATA(ANO; MES-1; DIA+1) -> Closing Date - 1 Month + 1 Day
     function getCycleStart(closingDate) {
         const d = new Date(closingDate);
         d.setMonth(d.getMonth() - 1);
@@ -347,7 +474,6 @@
         return d;
     }
 
-    // Logic: Calculate Days Difference
     function getDiffDays(d1, d2) {
         const oneDay = 24 * 60 * 60 * 1000;
         return Math.round((d1 - d2) / oneDay);
@@ -363,103 +489,64 @@
 
         const reqDate = parseDate(reqDateStr);
 
-        // 1. Determine OLD Cycle Data
+        // Ciclo Antigo
         const oldClosing = getCycleClosing(reqDate, currentDue);
         const oldStart = getCycleStart(oldClosing);
 
-        // Update UI for Old Cycle
         document.getElementById('oldCycleClose').value = formatDate(oldClosing);
         document.getElementById('oldCycleStart').value = formatDate(oldStart);
 
-        // 2. Determine NEW Cycle Data
-        // To match the screenshot logic (Venc 30 -> 11/01/2026 for Req 08/12),
-        // we find a New Cycle Start that creates a "valid" pro-rata period (usually > ~10 days).
-        
+        // Novo Ciclo
         let validNewStart = null;
         let validNewClosing = null;
-        let tempDate = new Date(reqDate); // Start search from request date
+        let tempDate = new Date(reqDate); 
 
-        // Initial Candidate
         let candidateClosing = getCycleClosing(tempDate, newDue);
         let candidateStart = getCycleStart(candidateClosing);
 
-        // Logic Loop:
-        // If the calculated start is before or equal to Request Date, OR 
-        // if the gap (NewStart - OldStart) is surprisingly small (e.g., < 9 days), 
-        // bump to next cycle.
-        // Based on screenshot: Due 30 (Start 11/12/2025) was skipped (Gap 9 days).
-        // Due 5 (Start 21/12/2025) was kept (Gap 19 days).
-        // Threshold appears to be around 10 days.
-
         while (true) {
             const daysGap = getDiffDays(candidateStart, oldStart);
-            
-            // Criteria: Must be future relative to Old Start AND have minimum gap
-            // AND strictly > Request Date is usually implied but screenshot has overlapping dates logic.
-            // The safest bet matching the data is checking the Days Gap.
-            
             if (candidateStart > reqDate || daysGap >= 10) {
-                 // Check if it's strictly in the past of request?
-                 // In screenshot, Due 5 starts 21/12, Req is 08/12. It is future.
-                 // Due 30 skipped 11/12 (which is future of 08/12) because gap was 9 days.
                  if (daysGap >= 10) {
                      validNewStart = candidateStart;
                      validNewClosing = candidateClosing;
                      break;
                  }
             }
-
-            // Move to next month
             candidateClosing.setMonth(candidateClosing.getMonth() + 1);
             candidateStart = getCycleStart(candidateClosing);
-            
-            // Safety break
             if (getDiffDays(candidateStart, reqDate) > 365) break; 
         }
 
         const daysUsed = getDiffDays(validNewStart, oldStart);
         
-        // Calculate Value
-        // Formula: (Plan / DaysInNewCycle) * DaysUsed
-        const daysInNewCycle = getDiffDays(validNewClosing, validNewStart) + 1; // Inclusive
+        // Cálculo
+        const daysInNewCycle = getDiffDays(validNewClosing, validNewStart) + 1;
         const proRataValue = (planValue / daysInNewCycle) * daysUsed;
         
-        // 3. Determine Next Due Date (Vencimento)
-        // Usually, the invoice due date is related to the Closing date.
-        // In screenshot: Closing 10/02/2026 -> Due 28/02/2026? 
-        // Due Day is 30. Feb has 28 days.
-        // Rule: Due Day of the Month of Closing (or Next Month?)
-        // Standard: If Closing 10, Due 30 (Same month).
-        // If Closing 20, Due 5 (Next month).
-        // Let's approximate based on input "Novo vencimento".
-        
+        // Data Vencimento
         let nextDueDate = new Date(validNewClosing);
-        // If Due Day > Closing Day, usually same month.
-        // If Due Day < Closing Day, next month.
         if (newDue > validNewClosing.getDate()) {
-            // Same month as closing
-            // Handle end of month (e.g. Feb 30 -> Feb 28)
             const lastDayOfMonth = new Date(nextDueDate.getFullYear(), nextDueDate.getMonth() + 1, 0).getDate();
-            const actualDay = Math.min(newDue, lastDayOfMonth);
-            nextDueDate.setDate(actualDay);
+            nextDueDate.setDate(Math.min(newDue, lastDayOfMonth));
         } else {
-            // Next month
             nextDueDate.setMonth(nextDueDate.getMonth() + 1);
             const lastDayOfMonth = new Date(nextDueDate.getFullYear(), nextDueDate.getMonth() + 1, 0).getDate();
-            const actualDay = Math.min(newDue, lastDayOfMonth);
-            nextDueDate.setDate(actualDay);
+            nextDueDate.setDate(Math.min(newDue, lastDayOfMonth));
         }
 
-        // Update UI Results
-        document.getElementById('newCycleCode').value = "2"; // Static/Example code
+        // Atualiza UI
+        document.getElementById('newCycleCode').value = "2"; 
         document.getElementById('newCycleStart').value = formatDate(validNewStart);
         document.getElementById('newCycleEnd').value = formatDate(validNewClosing);
         document.getElementById('nextDueDate').value = formatDate(nextDueDate);
         document.getElementById('daysUsed').value = daysUsed;
         document.getElementById('nextInvoiceValue').value = proRataValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-        // Update Simulation Table
         updateSimulationTable(reqDate, oldStart, planValue);
+        
+        // Atualiza Gráfico com lógica proporcional
+        updateChart(proRataValue, planValue, daysUsed, nextDueDate);
     }
 
     function updateSimulationTable(reqDate, oldStart, planValue) {
@@ -469,11 +556,9 @@
         const selectedDue = parseInt(document.getElementById('newDue').value);
 
         dues.forEach(simDue => {
-            // Logic replication for simulation
             let tempClosing = getCycleClosing(reqDate, simDue);
             let tempStart = getCycleStart(tempClosing);
             
-            // Same loop as main function
             while (true) {
                 const gap = getDiffDays(tempStart, oldStart);
                 if (gap >= 10) break; 
@@ -498,20 +583,116 @@
         });
     }
 
-    // Initialize
+    function updateChart(proRataValue, planValue, daysUsed, firstDueDate) {
+        const ctx = document.getElementById('invoiceChart').getContext('2d');
+        
+        // Calculando as datas para os labels
+        const d1 = new Date(firstDueDate); 
+        const d2 = new Date(d1); d2.setMonth(d2.getMonth() + 1); 
+        const d3 = new Date(d1); d3.setMonth(d3.getMonth() + 2); 
+
+        const label1 = d1.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+        const label2 = d2.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+        const label3 = d3.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+
+        const dataPoints = [
+            { x: 0, y: planValue, label: "Anterior" }, 
+            { x: daysUsed, y: proRataValue, label: `Pro-Rata (${label1})` }, 
+            { x: daysUsed + 30, y: planValue, label: `Normal (${label2})` }, 
+            { x: daysUsed + 60, y: planValue, label: `Normal (${label3})` } 
+        ];
+
+        if (invoiceChart) {
+            invoiceChart.destroy();
+        }
+
+        invoiceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Valor da Fatura',
+                    data: dataPoints,
+                    borderColor: '#f15a29',
+                    backgroundColor: 'rgba(241, 90, 41, 0.2)',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#f15a29',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    fill: true,
+                    tension: 0.2 
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        displayColors: false,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        padding: 10,
+                        callbacks: {
+                            title: function(context) {
+                                return context[0].raw.label; 
+                            },
+                            label: function(context) {
+                                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        min: -5,
+                        max: daysUsed + 65, 
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#666',
+                            callback: function(value, index, values) {
+                                const point = dataPoints.find(p => Math.abs(p.x - value) < 1);
+                                if (point) {
+                                    if (point.x === 0) return "Fatura Anterior";
+                                    if (point.x === daysUsed) return `Pro-Rata (${daysUsed}d)`;
+                                    return point.label.split(' ')[1].replace(/[()]/g, '');
+                                }
+                                return '';
+                            },
+                            stepSize: 1
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#eee',
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            color: '#777',
+                            callback: function(value) {
+                                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-        // Set default Request Date to Today
         const today = new Date();
         document.getElementById('reqDate').valueAsDate = today;
 
-        // Add Listeners
         const inputs = document.querySelectorAll('input, select');
         inputs.forEach(input => {
             input.addEventListener('change', calculate);
-            input.addEventListener('input', calculate); // Instant update
+            input.addEventListener('input', calculate);
         });
 
-        // First Calculation
         calculate();
     });
 
